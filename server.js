@@ -54,24 +54,24 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
-// Define upload route
-app.post(
-  "https://imagetourl-backend.onrender.com",
-  upload.single("image"),
-  (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
+app.get("/", (req, res) => {
+  res.send("Welcome to the Image Upload API!");
+});
 
-      // Image uploaded successfully, return the Cloudinary URL in JSON format
-      res.json({ url: req.file.secure_url });
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      res.status(500).json({ error: "Internal server error" });
+// Define upload route
+app.post("/upload", upload.single("image"), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
     }
+
+    // Image uploaded successfully, return the Cloudinary URL in JSON format
+    res.json({ url: req.file.secure_url });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-);
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
