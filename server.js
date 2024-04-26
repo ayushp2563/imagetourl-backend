@@ -1,39 +1,10 @@
 const express = require("express");
-const cors = require("cors");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 require("dotenv").config();
 
 const app = express();
-const allowedOrigins = [
-  "https://imagetourl-nine.vercel.app", // Production URL
-  "http://localhost:5173", // Development URL
-];
-
-// Use CORS middleware with dynamic origin handling
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow all origins for local development
-      if (process.env.NODE_ENV === "development") {
-        callback(null, true); // Allow the request
-        return;
-      }
-
-      // Check if the origin is allowed for production
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true); // Allow the request
-      } else {
-        callback(new Error("Not allowed by CORS")); // Deny the request
-      }
-    },
-    methods: ["GET", "POST", "OPTIONS"], // Allow GET, POST, and OPTIONS methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
-    credentials: true, // Allow cookies to be sent with requests (if applicable)
-    exposedHeaders: ["Access-Control-Allow-Origin"], // Expose the Access-Control-Allow-Origin header
-  })
-);
 
 // Cloudinary configuration
 cloudinary.config({
@@ -51,12 +22,7 @@ const storage = new CloudinaryStorage({
     public_id: (req, file) => `${Date.now()}-${file.originalname}`,
   },
 });
-
 const upload = multer({ storage: storage });
-
-app.get("/", (req, res) => {
-  res.send("Welcome to the Image Upload API!");
-});
 
 // Define upload route
 app.post("/upload", upload.single("image"), (req, res) => {
@@ -64,9 +30,8 @@ app.post("/upload", upload.single("image"), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
-
-    // Image uploaded successfully, return the Cloudinary URL in JSON format
-    res.json({ url: req.file.secure_url });
+    // Image uploaded successfully, return the Cloudinary URL
+    res.json({ url: req.file.path });
   } catch (error) {
     console.error("Error uploading image:", error);
     res.status(500).json({ error: "Internal server error" });
