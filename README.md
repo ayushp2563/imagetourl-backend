@@ -17,7 +17,7 @@ git clone https://github.com/ayushp2563/imagetourl-backend
 2. Change to the project directory:
 
 ```sh
-cd imagetourl
+cd imagetourl-backend
 ```
 
 3. Install the dependencies:
